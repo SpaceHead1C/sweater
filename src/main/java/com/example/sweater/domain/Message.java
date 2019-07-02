@@ -17,6 +17,13 @@ public class Message {
     private String text;
     private String tag;
 
+    public Message() {} // required by Spring
+
+    public Message(String text, String tag) {
+        this.text = text;
+        this.tag = tag;
+    }
+
     /**
      * Getters и Setters автоматически сгенерирует lombok
      */
