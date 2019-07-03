@@ -3,10 +3,10 @@ package com.example.sweater.controller;
 import com.example.sweater.domain.Message;
 import com.example.sweater.domain.User;
 import com.example.sweater.repos.MessageRepo;
-import com.example.sweater.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,7 +20,7 @@ public class MainController {
 
     @GetMapping("/")
     public String greeting(
-            @RequestParam(name="name", required=false, defaultValue="World") String name,
+            @RequestParam(name = "name", required = false, defaultValue = "World") String name,
             Map<String, Object> model
     ) {
         model.put("name", name);
@@ -28,10 +28,13 @@ public class MainController {
     }
 
     @GetMapping("/main")
-    public String main(Map<String, Object> model) {
-        Iterable<Message> mesages = messageRepo.findAll();
+    public String main(@RequestParam(required = false, defaultValue = "") String filter, Model model) {
+        Iterable<Message> messages = messageRepo.findAll();
 
-        model.put("messages", mesages);
+        messages = filter.isEmpty() ? messageRepo.findAll() : messageRepo.findByTag(filter);
+
+        model.addAttribute("messages", messages);
+        model.addAttribute("filter", filter);
 
         return "main";
     }
@@ -45,17 +48,6 @@ public class MainController {
         messageRepo.save(new Message(text, tag, user));
 
         model.put("messages", messageRepo.findAll());
-
-        return "main";
-    }
-
-    @PostMapping("/filter")
-    public String filter(@RequestParam String filter, Map<String, Object> model) {
-        Iterable<Message> messages;
-
-        messages = filter == null || filter.isEmpty() ? messageRepo.findAll() : messageRepo.findByTag(filter);
-
-        model.put("messages", messages);
 
         return "main";
     }
