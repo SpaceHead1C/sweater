@@ -82,6 +82,7 @@ public class MainController {
             messageRepo.save(message);
         }
 
+        model.addAttribute("message", null);
         model.addAttribute("messages", messageRepo.findAll());
 
         return "main";
